@@ -1,0 +1,55 @@
+.page {
+	font-family: var(--font-family);
+	font-weight: 400;
+	color: var(--text);
+}
+
+.page__body {
+	min-width: 375px;
+	background-color: var(--background);
+}
+
+.page__body--no-scroll {
+	overflow-y: hidden;
+}
+
+.container {
+	width: min(var(--container-width), 100% - var(--container-padding) * 2);
+	margin-inline: auto;
+}
+
+img {
+	-o-object-fit: cover;
+	object-fit: cover;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: 2px;
+}
+
+/* Typography
+.title-xl 
+.title-lg
+.title-md
+.title-sm
+.text-lg
+.text-md
+.text-sm
+
+Buttons
+.btn
+.btn-primary
+.btn-secondary
+
+Layout
+.section-mg {
+	margin-bottom: 80px;
+}
+
+Utilities
+.mt-40
+.mb-24
+.text-center */

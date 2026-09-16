@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Music Player</title>
+		<link rel="stylesheet" href="./css/index.css" />
+	</head>
+	<body>
+		<main class="player-app">
+			<section class="player-card" aria-label="Музыкальный плеер">
+				<!-- Скрытый аудио-элемент (управляется через JS) -->
+				<audio
+					src="./assets/audio/track-1.mp3"
+					id="audio-element"
+					preload="metadata"
+				></audio>
+
+				<!-- Блок информации о треке -->
+				<div class="track-info">
+					<div class="track-info__cover-wrapper">
+						<img
+							id="track-cover"
+							class="track-info__cover"
+							src=""
+							alt="Обложка трека"
+						/>
+					</div>
+					<h2 id="track-title" class="track-info__title">—</h2>
+					<p id="track-artist" class="track-info__artist">—</p>
+				</div>
+
+				<!-- Прогресс воспроизведения -->
+				<div class="progress-section">
+					<div class="progress-section__time">
+						<span id="current-time">0:00</span>
+						<span id="total-duration">0:00</span>
+					</div>
+					<!-- Кастомный range-инпут: доступен, удобен для мыши и тача -->
+					<input
+						type="range"
+						id="progress-bar"
+						class="progress-section__bar"
+						min="0"
+						max="100"
+						value="0"
+						step="0.1"
+						aria-label="Прогресс воспроизведения"
+					/>
+				</div>
+
+				<!-- Основные элементы управления -->
+				<div class="controls">
+					<button
+						id="btn-prev"
+						class="btn btn--secondary"
+						aria-label="Предыдущий трек"
+					>
+						⏮
+					</button>
+					<button
+						id="btn-play"
+						class="btn btn--primary"
+						aria-label="Воспроизведение"
+					>
+						<svg
+							class="icon icon-play"
+							width="30"
+							height="30"
+							viewBox="0 0 24 24"
+							fill="currentColor"
+						>
+							<path d="M8 5v14l11-7z" />
+						</svg>
+					</button>
+					<button
+						id="btn-next"
+						class="btn btn--secondary"
+						aria-label="Следующий трек"
+					>
+						⏭
+					</button>
+				</div>
+
+				<!-- Громкость -->
+				<div class="volume-control">
+					<span class="volume-control__icon" aria-hidden="true">🔊</span>
+					<input
+						type="range"
+						id="volume-bar"
+						class="volume-control__bar"
+						min="0"
+						max="1"
+						step="0.01"
+						value="0.8"
+						aria-label="Регулятор громкости"
+					/>
+				</div>
+			</section>
+
+			<!-- Плейлист -->
+			<aside class="playlist-section" aria-label="Список воспроизведения">
+				<h3 class="playlist-section__title">Очередь воспроизведения</h3>
+				<ul id="playlist-list" class="playlist-section__list">
+					<!-- Элементы списка будем генерировать динамически из JS -->
+				</ul>
+			</aside>
+		</main>
+
+		<script type="module" src="./js/index.js"></script>
+	</body>
+</html>

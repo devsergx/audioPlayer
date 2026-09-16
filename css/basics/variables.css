@@ -1,0 +1,15 @@
+:root {
+	--bg-main: #121216;
+	--bg-card: #1c1c24;
+	--bg-track: #2a2b36;
+	--primary-accent: #fb9a1a;
+	--primary-accent-hover: #ffae45;
+	--text-main: #ffffff;
+	--text-muted: #8c8d99;
+
+	--radius-lg: 20px;
+	--radius-md: 12px;
+	--radius-full: 9999px;
+
+	--transition-fast: 0.2s ease;
+}

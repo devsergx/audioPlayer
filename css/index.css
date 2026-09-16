@@ -1,0 +1,253 @@
+/* base */
+@import "./basics/normalize.css";
+@import "./basics/fonts.css";
+@import "./basics/variables.css";
+@import "./basics/globals.css";
+
+/* =========================================
+========================================= */
+
+body {
+	font-family:
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		"Segoe UI",
+		Roboto,
+		sans-serif;
+	background-color: var(--bg-main);
+	color: var(--text-main);
+	min-height: 100vh;
+	display: grid;
+	place-items: center;
+	padding: 24px;
+}
+
+/* =========================================
+   2. ОСНОВНОЙ КОНТЕЙНЕР И КАРТОЧКА
+   ========================================= */
+.player-app {
+	display: flex;
+	gap: 32px;
+	max-width: 800px;
+	width: 100%;
+	align-items: flex-start;
+	flex-wrap: wrap;
+}
+
+.player-card {
+	background-color: var(--bg-card);
+	border-radius: var(--radius-lg);
+	padding: 28px;
+	width: 100%;
+	max-width: 360px;
+	box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	margin: 0 auto;
+}
+
+/* =========================================
+   3. ИНФОРМАЦИЯ О ТРЕКЕ (ОБЛОЖКА, ТЕКСТ)
+   ========================================= */
+.track-info {
+	text-align: center;
+}
+
+.track-info__cover-wrapper {
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	border-radius: var(--radius-md);
+	overflow: hidden;
+	background-color: var(--bg-track);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+	margin-bottom: 16px;
+}
+
+.track-info__cover {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	transition: transform 0.3s ease;
+}
+
+.track-info__title {
+	font-size: 1.25rem;
+	font-weight: 600;
+	margin-bottom: 4px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.track-info__artist {
+	font-size: 0.9rem;
+	color: var(--text-muted);
+}
+
+/* =========================================
+   4. ПРОГРЕСС-БАР И ТАЙМИНГ
+   ========================================= */
+.progress-section {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.progress-section__time {
+	display: flex;
+	justify-content: space-between;
+	font-size: 0.75rem;
+	color: var(--text-muted);
+	font-variant-numeric: tabular-nums; /* Цифры фиксированной ширины не скачут */
+}
+
+/* Стилизация input range */
+input[type="range"] {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 100%;
+	height: 6px;
+	background: var(--bg-track);
+	border-radius: var(--radius-full);
+	outline: none;
+	cursor: pointer;
+	transition: background var(--transition-fast);
+}
+
+/* Бегунок (Thumb) */
+input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: var(--primary-accent);
+	box-shadow: 0 0 6px rgba(255, 75, 92, 0.5);
+	transition: transform var(--transition-fast);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+	transform: scale(1.25);
+}
+
+input[type="range"]::-moz-range-thumb {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: var(--primary-accent);
+	border: none;
+}
+
+/* =========================================
+   5. КНОПКИ УПРАВЛЕНИЯ
+   ========================================= */
+.controls {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 20px;
+}
+
+.btn {
+	border: none;
+	background: none;
+	color: var(--text-main);
+	cursor: pointer;
+	display: grid;
+	place-items: center;
+	line-height: 1;
+	border-radius: var(--radius-full);
+	transition:
+		transform var(--transition-fast),
+		background-color var(--transition-fast);
+}
+
+.btn:active {
+	transform: scale(0.95);
+}
+
+.btn--primary {
+	width: 56px;
+	height: 56px;
+	background-color: var(--primary-accent);
+	font-size: 1.4rem;
+	box-shadow: 0 6px 20px #fb991a5f;
+}
+
+.btn--primary:hover {
+	background-color: var(--primary-accent-hover);
+}
+
+.btn--secondary {
+	width: 44px;
+	height: 44px;
+	background-color: var(--bg-track);
+	font-size: 1.1rem;
+}
+
+.btn--secondary:hover {
+	background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* =========================================
+   6. ГРОМКОСТЬ
+   ========================================= */
+.volume-control {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 4px 8px;
+}
+
+.volume-control__icon {
+	font-size: 0.9rem;
+}
+
+/* =========================================
+   7. ПЛЕЙЛИСТ
+   ========================================= */
+.playlist-section {
+	flex: 1;
+	min-width: 280px;
+	background-color: var(--bg-card);
+	border-radius: var(--radius-lg);
+	padding: 24px;
+	box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+.playlist-section__title {
+	font-size: 1rem;
+	font-weight: 600;
+	margin-bottom: 16px;
+}
+
+.playlist-section__list {
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+/* Стили для будущих пунктов плейлиста */
+.playlist-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 14px;
+	border-radius: var(--radius-md);
+	background-color: transparent;
+	cursor: pointer;
+	transition: background-color var(--transition-fast);
+}
+
+.playlist-item:hover {
+	background-color: var(--bg-track);
+}
+
+.playlist-item--active {
+	background-color: var(--bg-track);
+	border-left: 3px solid var(--primary-accent);
+}
