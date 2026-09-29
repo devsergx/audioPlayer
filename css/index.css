@@ -204,6 +204,11 @@ input[type="range"]::-moz-range-thumb {
 
 .volume-control__icon {
 	font-size: 0.9rem;
+	cursor: pointer;
+}
+
+.hidden {
+	display: none;
 }
 
 /* =========================================

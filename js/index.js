@@ -3,9 +3,7 @@
 // playlist
 import { playlist } from "./tracks.js";
 
-// ========================================================= //
-
-// elements
+// Elements
 const audioElement = document.getElementById("audio-element");
 const cover = document.getElementById("track-cover");
 const title = document.getElementById("track-title");
@@ -16,9 +14,18 @@ const nextBtn = document.getElementById("btn-next");
 const labelCurrentTime = document.getElementById("current-time");
 const labelTotalDuration = document.getElementById("total-duration");
 const progressBar = document.getElementById("progress-bar");
+const volumeBar = document.getElementById("volume-bar");
+const volumeBtn = document.querySelector(".volume-control__button");
+const volumeBarIcon = document.querySelector(".volume-control__icon");
+const volumeBarIconMuted = document.querySelector(
+	".volume-control__icon--muted",
+);
 
-// текущий трек
+// текущий index трека
 let currentTrackIndex = 0;
+
+// состояние трека играет / не играет
+let isPlaying = false;
 
 // загружаем информацию о треке
 function loadTrack(trackIndex) {
@@ -31,6 +38,13 @@ function loadTrack(trackIndex) {
 }
 loadTrack(currentTrackIndex);
 
+// начальная громкость трека
+audioElement.volume = 0.3;
+
+// переменная-буфер для последнего значения audioElement
+let lastVolume;
+
+// functions
 function playTrack() {
 	audioElement.play();
 	isPlaying = true;
@@ -85,15 +99,8 @@ function prevTrack() {
 
 	if (isPlaying) playTrack();
 }
-// ================= //
 
-let isPlaying = false;
-
-playBtn.addEventListener("click", togglePlay);
-nextBtn.addEventListener("click", nextTrack);
-prevBtn.addEventListener("click", prevTrack);
-
-// форматирование времени
+// вспомогательная функция форматирование времени
 function formatTime(seconds) {
 	if (isNaN(seconds)) return "0:00";
 	const min = Math.floor(seconds / 60);
@@ -111,8 +118,6 @@ function updateProgress() {
 		progressBar.value = (currentTime / duration) * 100;
 	}
 }
-audioElement.addEventListener("loadedmetadata", updateProgress);
-audioElement.addEventListener("timeupdate", updateProgress);
 
 // ручная перемотка трека
 function setProgress() {
@@ -121,9 +126,50 @@ function setProgress() {
 			(progressBar.value / 100) * audioElement.duration;
 	}
 }
+
+// ручное изменение громкости
+function setVolume() {
+	audioElement.volume = +volumeBar.value;
+	if (audioElement.volume > 0) {
+		lastVolume = audioElement.volume;
+		volumeBarIcon.classList.remove("hidden");
+		volumeBarIconMuted.classList.add("hidden");
+	} else {
+		volumeBarIcon.classList.add("hidden");
+		volumeBarIconMuted.classList.remove("hidden");
+	}
+}
+
+// mute track по нажатию на иконку звука
+function toggleMute() {
+	if (audioElement.volume > 0) {
+		lastVolume = audioElement.volume;
+		volumeBar.value = 0;
+		audioElement.volume = 0;
+		volumeBarIcon.classList.add("hidden");
+		volumeBarIconMuted.classList.remove("hidden");
+	} else {
+		audioElement.volume = lastVolume;
+		volumeBar.value = lastVolume;
+		volumeBarIcon.classList.remove("hidden");
+		volumeBarIconMuted.classList.add("hidden");
+	}
+}
+// ================= //
+
+// addEventListeners
+playBtn.addEventListener("click", togglePlay);
+nextBtn.addEventListener("click", nextTrack);
+prevBtn.addEventListener("click", prevTrack);
+
+audioElement.addEventListener("loadedmetadata", updateProgress);
+audioElement.addEventListener("timeupdate", updateProgress);
 progressBar.addEventListener("input", setProgress);
 
 // загрузка нового трека после конца предыдущего
-audioElement.addEventListener("ended", () => {
-	nextTrack();
-});
+audioElement.addEventListener("ended", nextTrack);
+volumeBar.addEventListener("input", setVolume);
+
+volumeBtn.addEventListener("click", toggleMute);
+
+
