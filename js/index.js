@@ -1,5 +1,3 @@
-"use strict";
-
 // playlist
 import { playlist } from "./tracks.js";
 
@@ -20,12 +18,46 @@ const volumeBarIcon = document.querySelector(".volume-control__icon");
 const volumeBarIconMuted = document.querySelector(
 	".volume-control__icon--muted",
 );
+const playlistContainer = document.getElementById("playlist-list");
 
 // текущий index трека
 let currentTrackIndex = 0;
 
 // состояние трека играет / не играет
 let isPlaying = false;
+
+// начальная громкость трека
+audioElement.volume = 0.3;
+
+// переменная-буфер для последнего значения audioElement
+let lastVolume;
+
+// functions
+function renderPlaylist() {
+	playlistContainer.innerHTML = "";
+	playlist.forEach((track, index) => {
+		const html = `
+			<li class="playlist-item" data-index="${index}">
+  			<div class="playlist-item__info">
+    			<span class="playlist-item__title">${track.title}</span>
+    			<span class="playlist-item__artist">${track.artist}</span>
+  			</div>
+  				<span class="playlist-item__duration">${formatTime(track.duration)}</span>
+			</li>
+		`;
+		playlistContainer.insertAdjacentHTML("beforeend", html);
+	});
+}
+renderPlaylist();
+updateActiveTrack(currentTrackIndex);
+
+function updateActiveTrack(trackIndex) {
+	const items = document.querySelectorAll(".playlist-item");
+	items.forEach(item => item.classList.remove("playlist-item--active"));
+	if (items[trackIndex]) {
+		items[trackIndex].classList.add("playlist-item--active");
+	}
+}
 
 // загружаем информацию о треке
 function loadTrack(trackIndex) {
@@ -38,13 +70,6 @@ function loadTrack(trackIndex) {
 }
 loadTrack(currentTrackIndex);
 
-// начальная громкость трека
-audioElement.volume = 0.3;
-
-// переменная-буфер для последнего значения audioElement
-let lastVolume;
-
-// functions
 function playTrack() {
 	audioElement.play();
 	isPlaying = true;
@@ -89,6 +114,8 @@ function nextTrack() {
 	loadTrack(currentTrackIndex);
 
 	if (isPlaying) playTrack();
+
+	updateActiveTrack(currentTrackIndex);
 }
 
 function prevTrack() {
@@ -98,6 +125,8 @@ function prevTrack() {
 	loadTrack(currentTrackIndex);
 
 	if (isPlaying) playTrack();
+
+	updateActiveTrack(currentTrackIndex);
 }
 
 // вспомогательная функция форматирование времени
@@ -161,15 +190,18 @@ function toggleMute() {
 playBtn.addEventListener("click", togglePlay);
 nextBtn.addEventListener("click", nextTrack);
 prevBtn.addEventListener("click", prevTrack);
-
 audioElement.addEventListener("loadedmetadata", updateProgress);
 audioElement.addEventListener("timeupdate", updateProgress);
 progressBar.addEventListener("input", setProgress);
-
-// загрузка нового трека после конца предыдущего
 audioElement.addEventListener("ended", nextTrack);
 volumeBar.addEventListener("input", setVolume);
-
 volumeBtn.addEventListener("click", toggleMute);
+playlistContainer.addEventListener("click", event => {
+	const item = event.target.closest(".playlist-item");
+	if (!item) return;
 
-
+	const itemIndex = +item.dataset.index;
+	updateActiveTrack(itemIndex);
+	loadTrack(itemIndex);
+	playTrack();
+});
