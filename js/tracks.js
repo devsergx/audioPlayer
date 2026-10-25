@@ -1,12 +1,12 @@
 // tracks
-export const playlist = [
+const playlist = [
 	{
 		id: 1,
 		title: "Lost in the City Lights",
 		artist: "Cosmo Sheldrake",
 		src: "./assets/audio/track-1.mp3",
 		cover: "./assets/images/cover-1.jpg",
-		duration: 192, // длительность в секундах (полезно до загрузки аудиометаданных)
+		duration: 192,
 	},
 	{
 		id: 2,
@@ -24,4 +24,54 @@ export const playlist = [
 		cover: "./assets/images/cover-3.jpg",
 		duration: 147,
 	},
+	{
+		id: 4,
+		title: "Moments",
+		artist: "SAGI & PLVTINA",
+		src: "./assets/audio/track-4.mp3",
+		cover: "./assets/images/cover-1.jpg",
+		duration: 193,
+	},
+	{
+		id: 5,
+		title: "DOPE GAME",
+		artist: "SYCHO",
+		src: "./assets/audio/track-5.mp3",
+		cover: "./assets/images/cover-2.jpg",
+		duration: 194,
+	},
+	{
+		id: 6,
+		title: "Lost In the Dark",
+		artist: "Lukas Goss & Jessi Woodruff",
+		src: "./assets/audio/track-6.mp3",
+		cover: "./assets/images/cover-3.jpg",
+		duration: 177,
+	},
+	{
+		id: 7,
+		title: "They Want A Freak",
+		artist: "KARTER DARK, Devilish Trio",
+		src: "./assets/audio/track-7.mp3",
+		cover: "./assets/images/cover-1.jpg",
+		duration: 221,
+	},
+	{
+		id: 8,
+		title: "Dead Presidents ||",
+		artist: "Jay-Z",
+		src: "./assets/audio/track-8.mp3",
+		cover: "./assets/images/cover-2.jpg",
+		duration: 265,
+	},
+	{
+		id: 9,
+		title: "One Chance",
+		artist: "INTERWORLD, MoonDeity",
+		src: "./assets/audio/track-9.mp3",
+		cover: "./assets/images/cover-3.jpg",
+		duration: 131,
+	},
 ];
+
+export default playlist;

@@ -1,8 +1,7 @@
 // playlist
-import { playlist } from "./tracks.js";
+import playlist from "./tracks.js";
 
 // Elements
-const audioElement = document.getElementById("audio-element");
 const cover = document.getElementById("track-cover");
 const title = document.getElementById("track-title");
 const artist = document.getElementById("track-artist");
@@ -20,188 +19,210 @@ const volumeBarIconMuted = document.querySelector(
 );
 const playlistContainer = document.getElementById("playlist-list");
 
-// текущий index трека
-let currentTrackIndex = 0;
+// init musicPlayer
+class MusicPlayer {
+	constructor(playlist) {
+		this.playlist = playlist;
+		this.currentIndex = 0;
+		this.isPlaying = false;
+		this.lastVolume = 0.3;
 
-// состояние трека играет / не играет
-let isPlaying = false;
+		// Сам аудиоплеер браузера
+		this.audio = new Audio();
+		this.audio.volume = this.lastVolume;
 
-// начальная громкость трека
-audioElement.volume = 0.3;
+		this.renderPlaylist();
+		this.loadTrack();
+		this.initListeners();
+	}
 
-// переменная-буфер для последнего значения audioElement
-let lastVolume;
+	loadTrack() {
+		const track = this.playlist[this.currentIndex];
+		this.audio.src = track.src;
+		cover.src = track.cover;
+		title.textContent = track.title;
+		artist.textContent = track.artist;
 
-// functions
-function renderPlaylist() {
-	playlistContainer.innerHTML = "";
-	playlist.forEach((track, index) => {
-		const html = `
+		this.updateActiveTrack();
+	}
+
+	play() {
+		this.audio.play();
+		this.isPlaying = true;
+		playBtn.innerHTML = `
+		<svg 
+			class="icon 
+			icon--pause" 
+			width="26" 
+			height="26" 
+			viewBox="0 0 24 24" 
+			fill="currentColor">
+  		<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+		</svg>`;
+	}
+
+	pause() {
+		this.audio.pause();
+		this.isPlaying = false;
+		playBtn.innerHTML = `
+		<svg 
+			class="icon icon-play" 
+			width="30" 
+			height="30" 
+			viewBox="0 0 24 24" 
+			fill="currentColor">
+			<path d="M8 5v14l11-7z" />
+		</svg>`;
+	}
+
+	togglePlay() {
+		if (this.isPlaying) {
+			this.pause();
+		} else {
+			this.play();
+		}
+	}
+
+	next() {
+		this.currentIndex++;
+
+		if (this.currentIndex >= this.playlist.length) {
+			this.currentIndex = 0;
+		}
+
+		this.loadTrack(this.currentIndex);
+
+		if (this.isPlaying) this.play();
+	}
+
+	prev() {
+		this.currentIndex--;
+
+		if (this.currentIndex < 0) {
+			this.currentIndex = this.playlist.length - 1;
+		}
+
+		this.loadTrack(this.currentIndex);
+
+		if (this.isPlaying) this.play();
+	}
+
+	toggleMute() {
+		if (this.audio.volume > 0) {
+			this.lastVolume = this.audio.volume;
+			volumeBar.value = 0;
+			this.audio.volume = 0;
+		} else {
+			this.audio.volume = this.lastVolume;
+			volumeBar.value = this.lastVolume;
+		}
+		this.toggleMuteIcon();
+	}
+
+	toggleMuteIcon() {
+		const isMuted = this.audio.volume === 0;
+
+		volumeBarIcon.classList.toggle("hidden", isMuted);
+		volumeBarIconMuted.classList.toggle("hidden", !isMuted);
+	}
+
+	setVolume() {
+		this.audio.volume = +volumeBar.value;
+
+		if (this.audio.volume > 0) {
+			this.lastVolume = this.audio.volume;
+		}
+
+		this.toggleMuteIcon();
+	}
+
+	formatTime(seconds) {
+		if (isNaN(seconds)) return "0:00";
+		const min = Math.floor(seconds / 60);
+		const sec = String(Math.floor(seconds % 60)).padStart(2, 0);
+		const time = `${min}:${sec}`;
+		return time;
+	}
+
+	updateProgress() {
+		const { currentTime, duration } = this.audio;
+
+		labelTotalDuration.textContent = this.formatTime(duration);
+
+		if (!isNaN(duration)) {
+			labelCurrentTime.textContent = this.formatTime(currentTime);
+			progressBar.value = (currentTime / duration) * 100;
+		}
+	}
+
+	setProgress() {
+		if (!isNaN(this.audio.duration)) {
+			this.audio.currentTime = (progressBar.value / 100) * this.audio.duration;
+		}
+	}
+
+	renderPlaylist() {
+		playlistContainer.innerHTML = this.playlist
+			.map((track, index) => {
+				return `
 			<li class="playlist-item" data-index="${index}">
   			<div class="playlist-item__info">
     			<span class="playlist-item__title">${track.title}</span>
     			<span class="playlist-item__artist">${track.artist}</span>
   			</div>
-  				<span class="playlist-item__duration">${formatTime(track.duration)}</span>
+  				<span class="playlist-item__duration">${this.formatTime(track.duration)}</span>
 			</li>
 		`;
-		playlistContainer.insertAdjacentHTML("beforeend", html);
-	});
-}
-renderPlaylist();
-updateActiveTrack(currentTrackIndex);
+			})
+			.join("");
+	}
 
-function updateActiveTrack(trackIndex) {
-	const items = document.querySelectorAll(".playlist-item");
-	items.forEach(item => item.classList.remove("playlist-item--active"));
-	if (items[trackIndex]) {
-		items[trackIndex].classList.add("playlist-item--active");
+	updateActiveTrack() {
+		const items = document.querySelectorAll(".playlist-item");
+		items.forEach(item => item.classList.remove("playlist-item--active"));
+		if (items[this.currentIndex]) {
+			items[this.currentIndex].classList.add("playlist-item--active");
+		}
+	}
+
+	initListeners() {
+		// 1. Кнопки управления плеером
+		playBtn.addEventListener("click", () => this.togglePlay());
+		nextBtn.addEventListener("click", () => this.next());
+		prevBtn.addEventListener("click", () => this.prev());
+
+		// 2. Управление звуком
+		volumeBar.addEventListener("input", () => this.setVolume());
+		volumeBtn.addEventListener("click", () => {
+			this.toggleMute();
+		});
+
+		// 3. Полоса прогресса и события аудио
+		progressBar.addEventListener("input", () => this.setProgress());
+		this.audio.addEventListener("timeupdate", () => this.updateProgress());
+		this.audio.addEventListener("loadedmetadata", () => this.updateProgress());
+		this.audio.addEventListener("ended", () => this.next());
+
+		// 4. Делегирование клика по плейлисту
+		playlistContainer.addEventListener("click", event => {
+			const item = event.target.closest(".playlist-item");
+			if (!item) return;
+
+			const itemIndex = +item.dataset.index;
+			this.currentIndex = itemIndex;
+			this.updateActiveTrack(itemIndex);
+			this.loadTrack(itemIndex);
+			this.play();
+		});
+
+		// 5. Управление с клавиатуры (пробел)
+		document.body.addEventListener("keydown", e => {
+			if (e.code === "Space") {
+				e.preventDefault();
+				this.togglePlay();
+			}
+		});
 	}
 }
 
-// загружаем информацию о треке
-function loadTrack(trackIndex) {
-	const track = playlist[trackIndex];
-
-	cover.src = track.cover;
-	title.textContent = track.title;
-	artist.textContent = track.artist;
-	audioElement.src = track.src;
-}
-loadTrack(currentTrackIndex);
-
-function playTrack() {
-	audioElement.play();
-	isPlaying = true;
-	playBtn.innerHTML = `
-	<svg 
-		class="icon 
-		icon--pause" 
-		width="26" 
-		height="26" 
-		viewBox="0 0 24 24" 
-		fill="currentColor">
-  		<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-	</svg>`;
-}
-
-function pauseTrack() {
-	audioElement.pause();
-	isPlaying = false;
-	playBtn.innerHTML = `
-	<svg 
-		class="icon icon-play" 
-		width="30" 
-		height="30" 
-		viewBox="0 0 24 24" 
-		fill="currentColor">
-			<path d="M8 5v14l11-7z" />
-	</svg>`;
-}
-
-function togglePlay() {
-	if (isPlaying) {
-		pauseTrack();
-	} else {
-		playTrack();
-	}
-}
-
-function nextTrack() {
-	currentTrackIndex++;
-	if (currentTrackIndex >= playlist.length) currentTrackIndex = 0;
-
-	loadTrack(currentTrackIndex);
-
-	if (isPlaying) playTrack();
-
-	updateActiveTrack(currentTrackIndex);
-}
-
-function prevTrack() {
-	currentTrackIndex--;
-	if (currentTrackIndex < 0) currentTrackIndex = playlist.length - 1;
-
-	loadTrack(currentTrackIndex);
-
-	if (isPlaying) playTrack();
-
-	updateActiveTrack(currentTrackIndex);
-}
-
-// вспомогательная функция форматирование времени
-function formatTime(seconds) {
-	if (isNaN(seconds)) return "0:00";
-	const min = Math.floor(seconds / 60);
-	const sec = String(Math.floor(seconds % 60)).padStart(2, 0);
-	const time = `${min}:${sec}`;
-	return time;
-}
-
-// update currentTime and totalDuration
-function updateProgress() {
-	const { currentTime, duration } = audioElement;
-	if (!isNaN(duration)) {
-		labelCurrentTime.textContent = formatTime(currentTime);
-		labelTotalDuration.textContent = formatTime(duration);
-		progressBar.value = (currentTime / duration) * 100;
-	}
-}
-
-// ручная перемотка трека
-function setProgress() {
-	if (!isNaN(audioElement.duration)) {
-		audioElement.currentTime =
-			(progressBar.value / 100) * audioElement.duration;
-	}
-}
-
-// ручное изменение громкости
-function setVolume() {
-	audioElement.volume = +volumeBar.value;
-	if (audioElement.volume > 0) {
-		lastVolume = audioElement.volume;
-		volumeBarIcon.classList.remove("hidden");
-		volumeBarIconMuted.classList.add("hidden");
-	} else {
-		volumeBarIcon.classList.add("hidden");
-		volumeBarIconMuted.classList.remove("hidden");
-	}
-}
-
-// mute track по нажатию на иконку звука
-function toggleMute() {
-	if (audioElement.volume > 0) {
-		lastVolume = audioElement.volume;
-		volumeBar.value = 0;
-		audioElement.volume = 0;
-		volumeBarIcon.classList.add("hidden");
-		volumeBarIconMuted.classList.remove("hidden");
-	} else {
-		audioElement.volume = lastVolume;
-		volumeBar.value = lastVolume;
-		volumeBarIcon.classList.remove("hidden");
-		volumeBarIconMuted.classList.add("hidden");
-	}
-}
-// ================= //
-
-// addEventListeners
-playBtn.addEventListener("click", togglePlay);
-nextBtn.addEventListener("click", nextTrack);
-prevBtn.addEventListener("click", prevTrack);
-audioElement.addEventListener("loadedmetadata", updateProgress);
-audioElement.addEventListener("timeupdate", updateProgress);
-progressBar.addEventListener("input", setProgress);
-audioElement.addEventListener("ended", nextTrack);
-volumeBar.addEventListener("input", setVolume);
-volumeBtn.addEventListener("click", toggleMute);
-playlistContainer.addEventListener("click", event => {
-	const item = event.target.closest(".playlist-item");
-	if (!item) return;
-
-	const itemIndex = +item.dataset.index;
-	updateActiveTrack(itemIndex);
-	loadTrack(itemIndex);
-	playTrack();
-});
+const player = new MusicPlayer(playlist);
